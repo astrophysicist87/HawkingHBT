@@ -30,42 +30,42 @@ int main (void)
 	vector<double> r_pts(n_r_pts);
 	linspace(r_pts, 1.5, 2.0);
 
-	//vector<complex<double> > xi;
+	complex<double> Omega1 = 1.0 - 2.0*i*omega + 2.0*mu1;
+	complex<double> Omega2 = 2.0 * (s+nu+mu2-mu1-1.0);
+	complex<double> Omega3 = 1.0 - 2.0*s - 2.0*mu2;
+	complex<double> Delta1 = s*(s+1.0) - l*(l+1.0) + 2.0*(s+mu2)*(mu1-nu)
+								- nu + mu1 + mu2;
+	complex<double> Delta2 = mu2 * (2.0*s+mu2);
 
 	for (int ir = 0; ir < n_r_pts; ++ir)
 	{
 		double r = r_pts[ir];
-		//complex<double> r = r_pts[ir];
 		complex<double> prefactor = exp(nu*(r-1.0))*pow(r-1.0, mu1)*pow(r,mu2+s+1.0);
-
-		//xi.clear();
-		//xi.resize(kmax, 0.0);
-		//xi[0] = xi0;
 		
-		complex<double> Omega1 = 1.0 - 2.0*i*omega + 2.0*mu1;
-		complex<double> Omega2 = 2.0 * (s+nu+mu2-mu1-1.0);
-		complex<double> Omega3 = 1.0 - 2.0*s - 2.0*mu2;
-		complex<double> Delta1 = s*(s+1.0) - l*(l+1.0) + 2.0*(s+mu2)*(mu1-nu)
-									- nu + mu1 + mu2;
-		complex<double> Delta2 = mu2 * (2.0*s+mu2);
+
+
+		//set N
+		const long int N = kmax;
+		complex<double> xiN = 1.0, xiNm1 = 0.0;
+		for (int k = N; k >= 2; --k)
+		{
+			
+		}
+
+
 
 		complex<double> alpha0 = Omega1 + 1.0, beta0 = Delta1;
-		//xi[1] = -beta0*xi0/alpha0;
 		complex<double> xi1 = -beta0*xi0/alpha0;
 		complex<double> xik = 0.0, xikm1 = xi1, xikm2 = xi0;
 
 		complex<double> sum = xi0 + xi1*(r-1.0)/r;
-		//cout << r << "   " << 0 << "   " << xi0.real() << "   " << 0 << endl;
-		//cout << r << "   " << 1 << "   " << sum.real() << "   " << sum.imag() << endl;
 
 		double r_coefficient = (r-1.0)/r;
-		//complex<double> alpha_km1 = 0.0, beta_km1 = 0.0, gamma_km1 = 0.0;
 
 		bool converged = false;
 		for (int k = 2; k < kmax; ++k)
 		{
 			r_coefficient *= (r-1.0)/r;
-			//cerr << r << "   " << r_coefficient << endl;
 			double km1 = k - 1;
 			complex<double> alpha_km1 = 1.0 + (Omega1 + 1.0)/km1 + Omega1 / (km1*km1);
 			complex<double> beta_km1 = -2.0 + (Omega2 + 2.0)/km1 + Delta1 / (km1*km1);
@@ -81,7 +81,6 @@ int main (void)
 			}
 			xikm2 = xikm1;
 			xikm1 = xik;
-			//cout << r << "   " << k << "   " << sum.real() << "   " << sum.imag() << endl;
 		}
 
 		sum *= prefactor;
