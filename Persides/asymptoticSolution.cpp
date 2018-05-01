@@ -17,20 +17,21 @@ int main(void)
 
 void run_asymptotics_v1()
 {
-	int l = 0;
-	int nmax = 100;
-	double x = 5.0, xs = 1.0;
+	int l = 4;
+	int nmax = 20;
+	double x = 25.0, xs = 24.9;
 	complex<double> tau0 = 1.0;
 	complex<double> tau1 = 0.5*i*double(l)*(l+1.0)*tau0;
+	complex<double> prefactor = pow( -i, complex<double>( double( l)+1.0));
 
 	complex<double> tau_nm2 = tau0;
 	complex<double> tau_nm1 = tau1;
 
 	complex<double> sum = tau0/x;
-	cout << 0 << "   " << sum.real() << "   " << sum.imag() << endl;
+	cout << 0 << "   " << (prefactor*sum).real() << "   " << (prefactor*sum).imag() << endl;
 
 	sum += tau1/(x*x);
-	cout << 1 << "   " << sum.real() << "   " << sum.imag() << endl;
+	cout << 1 << "   " << (prefactor*sum).real() << "   " << (prefactor*sum).imag() << endl;
 
 	double x_power = x*x;
 	
@@ -44,7 +45,7 @@ void run_asymptotics_v1()
 		tau_nm2 = tau_nm1;
 		tau_nm1 = tau_n;
 
-		cout << n << "   " << sum.real() << "   " << sum.imag() << endl;
+		cout << n << "   " << (prefactor*sum).real() << "   " << (prefactor*sum).imag() << endl;
 	}
 
 }

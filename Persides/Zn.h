@@ -15,9 +15,9 @@
 
 //some parameters
 const double xmin = 1.0;
-const double xmax = 20.0;
-const int nmax = 2;
-const int lmax = 1;
+const double xmax = 25.0;
+const int nmax = 20;
+const int lmax = 5;
 const int n_x_pts = 10000;
 const int order = n_x_pts - 1;
 const complex<double> i(0,1);

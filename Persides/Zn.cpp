@@ -90,7 +90,7 @@ if (1) return(8);
 
 
 		//output/return Zn...
-		///*
+		/*
 		for (int in = 0; in < nmax; ++in)
 		for (int ix = 0; ix < n_x_pts; ++ix)
 		{
@@ -105,7 +105,7 @@ if (1) return(8);
 				<< re << "   "
 				<< im << endl;
 		}
-		//*/
+		*/
 
 		/*
 		for (int ix = 0; ix < n_x_pts; ++ix)
@@ -127,6 +127,19 @@ if (1) return(8);
 					//<< Z0_deriv2_array[indexer(il, ix)].imag() << "   "
 					<< endl;
 		*/
+		double xs = 24.9;
+		for (int ix = 0; ix < n_x_pts; ++ix)
+		{
+			complex<double> sum = 0.0;
+		
+			for (int in = 0; in < nmax; ++in)
+			{
+				complex<double> Zn_loc = Zn_array[indexer(il, in, ix)];
+				sum += Zn_loc * pow(xs, double(in));
+			}
+			cout << x_pts[ix] << "   " << sum.real() << "   " << sum.imag() << endl;
+		}
+
 	}
 
 	//cout << "Exiting normally." << endl;
