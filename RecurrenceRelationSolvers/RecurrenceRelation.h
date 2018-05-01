@@ -48,12 +48,13 @@ namespace RecurrenceRelation
 				vector<complex<double> > * results_ptr,
 				complex<double>(*a_in)(int,void*),
 				complex<double>(*b_in)(int,void*),
-				void * p )
+				void * p,
+				int initial_index = 0 )
 	{
 		for (int iN = N; iN >= 1; --iN)
 			rn_ptr->at(iN-1) = -b_in(iN,p)/(a_in(iN,p)+rn_ptr->at(iN));
 	
-		for (int iN = 1; iN < results_ptr->size(); ++iN)
+		for (int iN = initial_index + 1; iN < results_ptr->size(); ++iN)
 			results_ptr->at(iN) = rn_ptr->at(iN-1)*results_ptr->at(iN-1);
 
 		return;
