@@ -44,7 +44,7 @@ int main (int argc, char* argv[])
 	for (int inu = 0; inu <= 1000; inu++)
 	{
 		double nu = -0.5 + 0.001*inu;
-		struct function_params params = { nu, 0.1 };
+		struct function_params params = { nu, 0.25 };
 
 		complex<double> result = get_discriminant(&params);
 
@@ -111,22 +111,31 @@ inline complex<double> gamma(int n, void * p)
 	return ( numerator / denominator );
 }
 
-inline complex<double> a(int n, void * p)
+inline complex<double> a_pos_n(int n, void * p)
 {
 	return( beta(n, p)/alpha(n, p) );
 }
 
-inline complex<double> b(int n, void * p)
+inline complex<double> b_pos_n(int n, void * p)
 {
 	return( gamma(n, p)/alpha(n, p) );
 }
 
+inline complex<double> a_neg_n(int n, void * p)
+{
+	return( beta(n, p)/gamma(n, p) );
+}
+
+inline complex<double> b_neg_n(int n, void * p)
+{
+	return( alpha(n, p)/gamma(n, p) );
+}
 
 
 complex<double> get_discriminant(void * p)
 {
-	complex<double> R1 = get_R1(&a, &b, p);
-	complex<double> L0 = get_L0(&a, &b, p);
+	complex<double> R1 = get_R1(&a_pos_n, &b_pos_n, p);
+	complex<double> L0 = get_L0(&a_neg_n, &b_neg_n, p);
 
 	return (R1*L0 - 1.0);
 }
@@ -148,7 +157,6 @@ complex<double> get_R1(complex<double>(*a_in)(int,void*),
 		v *= u - 1.0;
 		relative_increment = v/w;
 		w += v;
-		//cout << "r_" << k << " = " << w << endl;
 		k++;
 	} while (abs(relative_increment) >= threshold and k <= kmax);
 	if (abs(relative_increment) >= threshold)
@@ -165,7 +173,7 @@ complex<double> get_L0(complex<double>(*a_in)(int,void*),
 					void * p )
 {
 	double threshold = 1.e-10;
-	const int N = -1, kmax = 10;
+	const int N = 1, kmax = 10;
 	complex<double> u = 1.0, v = -b_in(N-1,p)/a_in(N-1,p);
 	complex<double> w = v;
 	complex<double> relative_increment = 1.0;
