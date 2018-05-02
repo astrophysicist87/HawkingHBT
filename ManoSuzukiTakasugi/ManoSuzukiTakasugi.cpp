@@ -16,7 +16,7 @@ void linspace(vector<double> & x, double a, double b);
 const complex<double> i(0.0, 1.0);
 const double tolerance = 1.e-10;
 bool check_for_convergence = true;
-const int l = 0, s = 0;
+const int l = 2, s = 2;
 
 struct function_params
 {
@@ -30,12 +30,16 @@ inline complex<double> beta(int n, void * p);
 inline complex<double> gamma(int n, void * p);
 inline complex<double> a(int n, void * p);
 inline complex<double> b(int n, void * p);
-complex<double> get_discriminant(void * p);
-complex<double> get_R1(complex<double>(*a_in)(int,void*),
-					complex<double>(*b_in)(int,void*),
+complex<double> discriminant(void * p);
+complex<double> evaluate_alpha0R1_continued_fraction(
+					complex<double>(*alpha_in)(int,void*),
+					complex<double>(*beta_in)(int,void*),
+					complex<double>(*gamma_in)(int,void*),
 					void * p );
-complex<double> get_L0(complex<double>(*a_in)(int,void*),
-					complex<double>(*b_in)(int,void*),
+complex<double> evaluate_gamma0Lm1_continued_fraction(
+					complex<double>(*alpha_in)(int,void*),
+					complex<double>(*beta_in)(int,void*),
+					complex<double>(*gamma_in)(int,void*),
 					void * p );
 
 
@@ -43,10 +47,10 @@ int main (int argc, char* argv[])
 {
 	for (int inu = 0; inu <= 1000; inu++)
 	{
-		double nu = -0.5 + 0.001*inu;
-		struct function_params params = { nu, 0.25 };
+		double nu = 1.9 + 0.0001*inu;
+		struct function_params params = { nu, 1.0/sqrt(10.0) };
 
-		complex<double> result = get_discriminant(&params);
+		complex<double> result = discriminant(&params);
 
 		cout << nu << "   " << result.real() << "   " << result.imag() << endl;
 	}
@@ -84,7 +88,7 @@ inline complex<double> alpha(int n, void * p)
 	complex<double> numerator = -i*e*(n+nu+1.0-i*e)*(n+nu-1.0-i*e)*(f3-double(s*s));
 	complex<double> denominator = (n+nu+3.0+i*e)*(n+nu+1.0)*(2.0*n+2.0*nu+3.0);
 
-	return ( numerator / denominator );
+	return ( numerator / (denominator+0.e-100) );
 }
 
 inline complex<double> beta(int n, void * p)
@@ -94,8 +98,8 @@ inline complex<double> beta(int n, void * p)
 	double e = (params->epsilon);
 	double e2 = e*e;
 
-	return ( (n+nu)*(n+nu+1.0) - l*(l+1.0) + 2.0*e2
-				+ e2*(s*s+e2)/((n+nu)*(n+nu+1.0)) );
+	return ( (n+nu)*(n+nu+1.0+0.e-100) - l*(l+1.0) + 2.0*e2
+				+ e2*(s*s+e2)/((n+nu)*(n+nu+1.0)+0.e-100) );
 }
 
 inline complex<double> gamma(int n, void * p)
@@ -108,95 +112,119 @@ inline complex<double> gamma(int n, void * p)
 	complex<double> numerator = i*e*(n+nu+2.0+i*e)*(n+nu+i*e)*(f3-double(s*s));
 	complex<double> denominator = (n+nu-2.0-i*e)*(n+nu)*(2.0*n+2.0*nu-1.0);
 
-	return ( numerator / denominator );
+	return ( numerator / (denominator+0.e-100) );
 }
 
-inline complex<double> a_pos_n(int n, void * p)
+complex<double> discriminant(void * p)
 {
-	return( beta(n, p)/alpha(n, p) );
+	return (
+			beta(0, p)
+			+ evaluate_alpha0R1_continued_fraction( &alpha, &beta, &gamma, p )
+			+ evaluate_gamma0Lm1_continued_fraction( &alpha, &beta, &gamma, p )
+			);
 }
 
-inline complex<double> b_pos_n(int n, void * p)
-{
-	return( gamma(n, p)/alpha(n, p) );
-}
-
-inline complex<double> a_neg_n(int n, void * p)
-{
-	return( beta(n, p)/gamma(n, p) );
-}
-
-inline complex<double> b_neg_n(int n, void * p)
-{
-	return( alpha(n, p)/gamma(n, p) );
-}
-
-
-complex<double> get_discriminant(void * p)
-{
-	complex<double> R1 = get_R1(&a_pos_n, &b_pos_n, p);
-	complex<double> L0 = get_L0(&a_neg_n, &b_neg_n, p);
-
-	return (R1*L0 - 1.0);
-}
-
-complex<double> get_R1(complex<double>(*a_in)(int,void*),
-					complex<double>(*b_in)(int,void*),
+//uses modified Lentz's method (cf. Numerical Recipes in C++)
+complex<double> evaluate_alpha0R1_continued_fraction(
+					complex<double>(*alpha_in)(int,void*),
+					complex<double>(*beta_in)(int,void*),
+					complex<double>(*gamma_in)(int,void*),
 					void * p )
 {
-	double threshold = 1.e-10;
-	const int N = 0, kmax = 10;
-	complex<double> u = 1.0, v = -b_in(N+1,p)/a_in(N+1,p);
-	complex<double> w = v;
-	complex<double> relative_increment = 1.0;
+	const int jmax = 100;
+	const double tiny = tolerance*1.e-20;
+	complex<double> result = tiny;
+	complex<double> C = result, D = 0.0;
+	const int start_index = 1;
 
-	int k = 1;
-	do
+	for (int j = 1; j <= jmax; j++)
 	{
-		u = 1.0 / (1.0 - u*b_in(N+k+1,p)/(a_in(N+k,p)*a_in(N+k+1,p)));
-		v *= u - 1.0;
-		relative_increment = v/w;
-		w += v;
-		k++;
-	} while (abs(relative_increment) >= threshold and k <= kmax);
-	if (abs(relative_increment) >= threshold)
-		cerr << "Warning in get_rN(): did not converge to desired threshold!" << endl
-				<< "\t abs(relative_increment) == " << abs(relative_increment) << endl
-				<< "\t threshold == " << threshold
-				<< endl;
+		//cerr << "BEFORE: " << j << "   " << C << "   " << D << "   " << result << endl;
+		//be careful with indexing
+		complex<double> a = -alpha(start_index + j - 2, p)
+							* gamma(start_index + j - 1, p);
+		complex<double> b = beta(start_index + j - 1, p);
 
-	return (w);
+		D = b + a * D;
+		if (abs(D) < tiny)
+			D = tiny;
+
+		C = b + a / C;
+		if (abs(C) < tiny)
+			C = tiny;
+
+		D = 1.0 / D;
+
+		complex<double> Delta = C * D;
+		result *= Delta;
+		if ( abs(Delta - 1.0) < tolerance )
+			break;
+		else if (j == jmax)
+			cerr << "Warning: modified Lentz's method did not converge!" << endl
+					<< "alpha0R1(): abs(Delta - 1.0) = " << abs(Delta - 1.0) 
+					<< " >= tolerance = " << tolerance << endl;
+		//cerr << "AFTER: " << j << "   " << C << "   " << D << "   "
+		//		<< Delta << "   " << Delta - 1.0 << "   " << abs(Delta - 1.0) << "   "
+		//		<< result << endl;
+	}
+
+	return (result);
 }
 
-complex<double> get_L0(complex<double>(*a_in)(int,void*),
-					complex<double>(*b_in)(int,void*),
+
+//uses modified Lentz's method (cf. Numerical Recipes in C++)
+complex<double> evaluate_gamma0Lm1_continued_fraction(
+					complex<double>(*alpha_in)(int,void*),
+					complex<double>(*beta_in)(int,void*),
+					complex<double>(*gamma_in)(int,void*),
 					void * p )
 {
-	double threshold = 1.e-10;
-	const int N = 1, kmax = 10;
-	complex<double> u = 1.0, v = -b_in(N-1,p)/a_in(N-1,p);
-	complex<double> w = v;
-	complex<double> relative_increment = 1.0;
+	const int jmax = 100;
+	const double tiny = tolerance*1.e-20;
+	complex<double> result = tiny;
+	complex<double> C = result, D = 0.0;
+	const int start_index = -1;
 
-	int k = 1;
-	do
+	for (int j = 1; j <= jmax; j++)
 	{
-		u = 1.0 / (1.0 - u*b_in(N-k-1,p)/(a_in(N-k,p)*a_in(N-k-1,p)));
-		v *= u - 1.0;
-		relative_increment = v/w;
-		w += v;
-		//cout << "r_" << k << " = " << w << endl;
-		k++;
-	} while (abs(relative_increment) >= threshold and k <= kmax);
-	if (abs(relative_increment) >= threshold)
-		cerr << "Warning in get_rN(): did not converge to desired threshold!" << endl
-				<< "\t abs(relative_increment) == " << abs(relative_increment) << endl
-				<< "\t threshold == " << threshold
-				<< endl;
+		//cerr << "BEFORE: " << j << "   " << C << "   " << D << "   " << result << endl;
+		//be careful with indexing
+		complex<double> a = -alpha(start_index - j + 1, p)
+							* gamma(start_index - j + 2, p);
+		complex<double> b = beta(start_index - j + 1, p);
 
-	return (w);
+		D = b + a * D;
+		//cerr << "check: " << j << "   " << C << "   " << D << "   "
+		//		<< alpha(start_index - j + 1, p) << "   " << gamma(start_index - j + 2, p) << "   "
+		//		<< result << endl;
+		if (abs(D) < tiny)
+			D = tiny;
+		//cerr << "check2: " << j << "   " << C << "   " << D << "   " << result << endl;
+
+		C = b + a / C;
+		//cerr << "check3: " << j << "   " << C << "   " << D << "   " << result << endl;
+		if (abs(C) < tiny)
+			C = tiny;
+		//cerr << "check4: " << j << "   " << C << "   " << D << "   " << result << endl;
+
+		D = 1.0 / D;
+		//cerr << "check5: " << j << "   " << C << "   " << D << "   " << result << endl;
+
+		complex<double> Delta = C * D;
+		result *= Delta;
+		if ( abs(Delta - 1.0) < tolerance )
+			break;
+		else if (j == jmax)
+			cerr << "Warning: modified Lentz's method did not converge!" << endl
+					<< "alpha0Lm1(): abs(Delta - 1.0) = " << abs(Delta - 1.0) 
+					<< " >= tolerance = " << tolerance << endl;
+		//cerr << "AFTER: " << j << "   " << C << "   " << D << "   "
+		//		<< Delta << "   " << Delta - 1.0 << "   " << abs(Delta - 1.0) << "   "
+		//		<< result << endl;
+	}
+
+	return (result);
 }
-
 
 
 /*
