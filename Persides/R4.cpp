@@ -32,7 +32,7 @@ int main(void)
 	//cout << "Next." << endl;
 	for (int n = 2; n < nmax; ++n)
 	{
-		cout << "n = " << n << endl;
+		//cout << "n = " << n << endl;
 		set_B1D(n);
 		set_C1D(n);
 
@@ -48,6 +48,19 @@ int main(void)
 			set_A3D(n, r, s);
 	}
 	//cout << "Here." << endl;
+
+	/*for (int y = 0; y < 91; ++y)
+	{
+		complex<double> sum = 0.0;
+		double y0 = 1.0 + 0.1*y;
+		for (int n = 0; n < nmax; ++n)
+		for (int r = 0; r < rmax; ++r)
+		for (int s = 0; s < smax; ++s)
+			sum += A3D.at(indexer_A3D(n, r, s))
+					* pow(y0, l+n-r) * pow(log(y0), s+1.e-10);
+		cout << y0 << "   " << sum << endl;
+	}
+	cout << endl;*/
 
 	return 0 ;
 }
@@ -102,7 +115,7 @@ void set_B1D(int n)
 	}
 
 	B1D.at(n) = sum;
-	cout << "B1D[" << n << "] = " << B1D.at(n) << endl;
+	//cout << "B1D[" << n << "] = " << B1D.at(n) << endl;
 
 	return;
 }
@@ -171,9 +184,10 @@ void set_C1D(int n)
 	double sum_accel_im = 0.0, err = 0.0;
 	compute_levin_sum(running_t_terms, &sum_accel_im, &err);
 
-	C1D.at(n) = sum;
+	//C1D.at(n) = sum;
+	C1D.at(n) = preliminary_sum + i*sum_accel_im;
 	cout << "C1D[" << n << "] = "
-			<< sum << "   "
+			//<< sum << "   "
 			<< preliminary_sum + i*sum_accel_im << endl;
 
 	return;
