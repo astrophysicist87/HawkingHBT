@@ -7,9 +7,21 @@
 
 using namespace std;
 
-const complex<double> i(0.0,1.0);
+vector<complex<double> > B1D, C1D;
+vector<complex<double> > A3D, B3D, C3D;
+vector<complex<double> > A4D;
 
-const int l = 0;
+const complex<double> i(0.0,1.0);
+const int rmax = 80, nmax = 3, smax = 3;
+const int tmax = rmax;
+const int l = 2;
+
+void initialize_A3D_starting_values();
+void set_B1D(int n);
+void set_C1D(int n);
+void set_A3D(int n, int r, int s);
+void set_B3D(int n, int t, int s);
+void set_C3D(int n, int t, int s);
 
 inline double pp(int r)
 {
@@ -18,8 +30,8 @@ inline double pp(int r)
 	else
 	{
 		double r_fact = gsl_sf_fact(r);
-		double lpr_fact = gsl_sf_fact(r);
-		double lmr_fact = gsl_sf_fact(r);
+		double lpr_fact = gsl_sf_fact(l+r);
+		double lmr_fact = gsl_sf_fact(l-r);
 
 		return ( pow(-1.0, r)*lpr_fact / ( r_fact*r_fact*lmr_fact ) );
 	}
@@ -53,7 +65,7 @@ inline double Al(int il)
 
 inline double D3D(int r, int s, int t)	//N.B. - not the same as r, s, t elsewhere!
 {
-	if ( r != -1 and 0 <= t < s+1 )
+	if ( r != -1 and 0 <= t and t < s+1 )
 	{
 		double num = pow(-1.0, s-t)*gsl_sf_fact(s);
 		double den = pow(r+1.0, s-t+1.0)*gsl_sf_fact(t);
@@ -69,3 +81,16 @@ inline int indexer_A3D(int n, int r, int s)
 {
 		return ( ( n * rmax + r ) * smax + s );
 }
+
+inline int indexer_B3D(int n, int t, int s)
+{
+		return ( ( n * rmax + t ) * smax + s );
+}
+
+inline int indexer_C3D(int n, int t, int s)
+{
+		return ( ( n * rmax + t ) * smax + s );
+}
+
+
+
