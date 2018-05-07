@@ -47,20 +47,21 @@ int main(void)
 		for (int s = 0; s < smax; ++s)
 			set_A3D(n, r, s);
 	}
-	//cout << "Here." << endl;
+	cout << "Here." << endl;
 
-	/*for (int y = 0; y < 91; ++y)
+	for (int n = 0; n < nmax; ++n)
+	for (int y = 0; y < 91; ++y)
 	{
 		complex<double> sum = 0.0;
 		double y0 = 1.0 + 0.1*y;
-		for (int n = 0; n < nmax; ++n)
 		for (int r = 0; r < rmax; ++r)
 		for (int s = 0; s < smax; ++s)
 			sum += A3D.at(indexer_A3D(n, r, s))
 					* pow(y0, l+n-r) * pow(log(y0), s+1.e-10);
-		cout << y0 << "   " << sum << endl;
+		cout << n << "   " << y0 << "   " << sum << endl;
 	}
-	cout << endl;*/
+	cout << endl;
+
 
 	return 0 ;
 }
@@ -136,13 +137,13 @@ void compute_levin_sum(vector<double> computed_terms, double * sum_accel, double
 
 	gsl_sum_levin_u_accel (t, N, w, sum_accel, err);
 
-	printf ("term-by-term sum = % .16f using %d terms\n", sum, N);
+	//printf ("term-by-term sum = % .16f using %d terms\n", sum, N);
 
-	printf ("term-by-term sum = % .16f using %zu terms\n", w->sum_plain, w->terms_used);
+	//printf ("term-by-term sum = % .16f using %zu terms\n", w->sum_plain, w->terms_used);
 
-	printf ("accelerated sum  = % .16f using %zu terms\n", *sum_accel, w->terms_used);
+	//printf ("accelerated sum  = % .16f using %zu terms\n", *sum_accel, w->terms_used);
 
-	printf ("estimated error  = % .16f\n", *err);
+	//printf ("estimated error  = % .16f\n", *err);
 
 	gsl_sum_levin_u_free (w);
 
@@ -173,9 +174,9 @@ void set_C1D(int n)
 		}
 		if (t > n)
 		{
-			//cout << "sum_" << t << " = " << sum_t << endl;
-			//cout << "sum: " << t << " = " << sum_t.imag() << endl;
-			running_t_terms.push_back(sum_t.imag());
+			//cout << "sum_" << t << " = " << sum << endl;
+			//cout << "sum: " << t << " = " << sum_t << endl;
+			running_t_terms.push_back( (pow(i,n+1.0)*sum_t).real() );
 		}
 		else
 			preliminary_sum += sum_t;
@@ -185,10 +186,10 @@ void set_C1D(int n)
 	compute_levin_sum(running_t_terms, &sum_accel_im, &err);
 
 	//C1D.at(n) = sum;
-	C1D.at(n) = preliminary_sum + i*sum_accel_im;
-	cout << "C1D[" << n << "] = "
+	C1D.at(n) = preliminary_sum + pow(i,-n-1.0)*sum_accel_im;
+	//cout << "C1D[" << n << "] = "
 			//<< sum << "   "
-			<< preliminary_sum + i*sum_accel_im << endl;
+	//		<< preliminary_sum + pow(i,-n-1.0)*sum_accel_im << endl;
 
 	return;
 }

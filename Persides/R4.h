@@ -12,7 +12,7 @@ vector<complex<double> > A3D, B3D, C3D;
 vector<complex<double> > A4D;
 
 const complex<double> i(0.0,1.0);
-const int rmax = 30, nmax = 10;
+const int rmax = 30, nmax = 2;
 const int smax = nmax;
 const int tmax = rmax;
 const int l = 2;
