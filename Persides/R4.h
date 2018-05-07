@@ -12,7 +12,7 @@ vector<complex<double> > A3D, B3D, C3D;
 vector<complex<double> > A4D;
 
 const complex<double> i(0.0,1.0);
-const int rmax = 30, nmax = 2;
+const int rmax = 30, nmax = 3;
 const int smax = nmax;
 const int tmax = rmax;
 const int l = 2;
@@ -24,12 +24,13 @@ void set_A3D(int n, int r, int s);
 void set_B3D(int n, int t, int s);
 void set_C3D(int n, int t, int s);
 
-inline double pp(int r)
+inline double pp(int r0)
 {
-	if (r > l || r < 0)
+	if (r0 > l || r0 < 0)
 		return (0.0);
 	else
 	{
+		int r = l - r0;
 		double r_fact = gsl_sf_fact(r);
 		double lpr_fact = gsl_sf_fact(l+r);
 		double lmr_fact = gsl_sf_fact(l-r);

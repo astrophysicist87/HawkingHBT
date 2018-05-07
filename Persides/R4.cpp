@@ -62,7 +62,6 @@ int main(void)
 	}
 	cout << endl;
 
-
 	return 0 ;
 }
 
@@ -112,11 +111,15 @@ void set_B1D(int n)
 		//if (n==3)
 		//	cout << (l-t+u+1.0) << "   " << pp(t-u) << "   "
 		//			<< A3D.at(indexer_A3D(n-1,u,v)) << "   " << D3D(2*l+n-1,v,0) << endl;
+
+		//PRE-TYPO FIX
 		sum += (l-t+u+1.0)*pp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(2*l+n-1,v,0);
+		//POST-TYPO FIX?
+		//sum += (t-u+1.0)*pp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(2*l+n-1,v,0);
 	}
 
 	B1D.at(n) = sum;
-	//cout << "B1D[" << n << "] = " << B1D.at(n) << endl;
+	cout << "B1D[" << n << "] = " << B1D.at(n) << endl;
 
 	return;
 }
@@ -187,9 +190,9 @@ void set_C1D(int n)
 
 	//C1D.at(n) = sum;
 	C1D.at(n) = preliminary_sum + pow(i,-n-1.0)*sum_accel_im;
-	//cout << "C1D[" << n << "] = "
+	cout << "C1D[" << n << "] = "
 			//<< sum << "   "
-	//		<< preliminary_sum + pow(i,-n-1.0)*sum_accel_im << endl;
+			<< preliminary_sum + pow(i,-n-1.0)*sum_accel_im << endl;
 
 	return;
 }
@@ -211,7 +214,10 @@ void set_B3D(int n, int t, int s)
 	complex<double> sum = 0.0;
 	for (int u = 0; u < rmax; ++u)
 	for (int v = 0; v < smax; ++v)
+		//PRE-TYPO FIX
 		sum += (l-t+u+1.0)*pp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(2*l+n-t,v,s);
+		//POST-TYPO FIX?
+		//sum += (t-u+1.0)*pp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(2*l+n-t,v,s);
 
 	B3D.at(indexer_B3D(n, t, s)) = sum - B1D.at(n)*double(s==0)*double(2*l+n+1==t);
 	//cout << "B3D[" << n << "," << t << "," << s << "] = " << B3D.at(indexer_B3D(n, t, s)) << endl;
