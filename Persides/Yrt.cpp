@@ -338,7 +338,9 @@ namespace Yrt_NS
 			for (int s = 0; s < smax; ++s)
 				sum += A3D.at(indexer_A3D(n, r, s))
 						* pow(y0, l+n-r) * pow(log(y0), s);
-			cout << n << "   " << y0 << "   " << ( ( n > 0 and abs(y0-1.0) < 1.e-30 ) ? 0.0 : sum ) << endl;
+			cout << n << "   " << y0 << "   "
+					<< ( ( n > 0 and abs(y0-1.0) < 1.e-30 ) ? 0.0 : sum )
+					<< endl;
 		}
 		cout << endl;
 
