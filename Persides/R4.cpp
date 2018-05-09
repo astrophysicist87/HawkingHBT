@@ -112,9 +112,9 @@ void set_B1D(int n)
 	{
 		//if (n==3)
 		//	cout << (l-t+u+1.0) << "   " << pp(t-u) << "   "
-		//			<< A3D.at(indexer_A3D(n-1,u,v)) << "   " << D3D(2*l+n-1,v,0) << endl;
+		//			<< A3D.at(indexer_A3D(n-1,u,v)) << "   " << D3D(2*l+n-t,v,0) << endl;
 
-		sum += (l-t+u+1.0)*pp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(2*l+n-1,v,0);
+		sum += (l-t+u+1.0)*pp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(2*l+n-t,v,0);
 	}
 
 	B1D.at(n) = sum;
