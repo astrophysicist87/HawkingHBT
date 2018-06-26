@@ -1,10 +1,17 @@
 SHELL=/bin/sh
 
 SRCS= \
-RWeqnSolver.cpp
+RWeqnSolver.cpp \
+Rin.cpp \
+Rout.cpp \
+system.cpp
+
 
 HDRS= \
-RWeqnSolver.h
+RWeqnSolver.h \
+Rin.h \
+Rout.h \
+system.h
 
 MAKEFILE=makefile
 
@@ -22,7 +29,13 @@ LIBS=
 $(COMMAND): $(OBJS) $(HDRS) $(MAKEFILE) 
 	$(CC) -o $(COMMAND) $(OBJS) $(LDFLAGS) $(LIBS)
 
-RWeqnSolver.o : RWeqnSolver.cpp RWeqnSolver.h
+Rin.o : Rin.cpp Rin.h
+	$(CC) $(CFLAGS) $(WARNFLAGS) $(LIBS) -c Rin.cpp -o Rin.o
+
+Rout.o : Rout.cpp Rout.h
+	$(CC) $(CFLAGS) $(WARNFLAGS) $(LIBS) -c Rout.cpp -o Rout.o
+
+RWeqnSolver.o : RWeqnSolver.cpp RWeqnSolver.h Rin.h
 	$(CC) $(CFLAGS) $(WARNFLAGS) $(LIBS) -c RWeqnSolver.cpp -o RWeqnSolver.o
 
 clean:
