@@ -3,7 +3,8 @@ SHELL=/bin/sh
 SRCS= \
 RWeqnSolver.cpp
 
-HDRS=
+HDRS= \
+RWeqnSolver.h
 
 MAKEFILE=makefile
 
@@ -19,9 +20,9 @@ LDFLAGS= -lgsl -lgslcblas -O3
 LIBS=
 
 $(COMMAND): $(OBJS) $(HDRS) $(MAKEFILE) 
-	$(CC) -o $(COMMAND) $(OBJS) $(LDFLAGS) $(CFLAGS) $(LIBS)
+	$(CC) -o $(COMMAND) $(OBJS) $(LDFLAGS) $(LIBS)
 
-RWeqnSolver.o : RWeqnSolver.cpp
+RWeqnSolver.o : RWeqnSolver.cpp RWeqnSolver.h
 	$(CC) $(CFLAGS) $(WARNFLAGS) $(LIBS) -c RWeqnSolver.cpp -o RWeqnSolver.o
 
 clean:
