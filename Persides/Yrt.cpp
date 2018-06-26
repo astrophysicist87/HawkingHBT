@@ -191,7 +191,7 @@ namespace Yrt_NS
 	}
 
 
-	/*
+	///*
 	void set_Yrt()
 	{
 		Yrt = vector<complex<double> >(rmax*smax*n_x_pts);
@@ -210,10 +210,16 @@ namespace Yrt_NS
 			{
 				if (t>s)
 					continue;
-				double Anrst = pow(-1.0,t)*gsl_sf_choose(s, t)*A3D[indexer_A3D(n,r,s)];
-				sum += Anrst*pow(x_loc, l+n-r)*pow(ln_x_loc, s-t);
+				complex<double> Anrst
+					= pow(-1.0,t)
+						* gsl_sf_choose(s, t)
+						* A3D[indexer_A3D(n,r,s)];
+				sum += Anrst
+						* pow(x_loc, l+n-r)
+						* pow(ln_x_loc, s-t);
 			}
-			Yrt[indexer_Yrt(r, t, ix)] = prefactor * sum;
+			Yrt[indexer_Yrt(r, t, ix)]
+					= prefactor * sum;
 		}
 
 		return;
@@ -236,8 +242,10 @@ namespace Yrt_NS
 
 			for (int ix = 1; ix < n_x_pts - 1; ++ix)
 			{
-				complex<double> fm1 = Yrt[indexer_Yrt(r, t, ix-1)];
-				complex<double> fp1 = Yrt[indexer_Yrt(r, t, ix+1)];
+				complex<double> fm1
+					= Yrt[indexer_Yrt(r, t, ix-1)];
+				complex<double> fp1
+					= Yrt[indexer_Yrt(r, t, ix+1)];
 				ddx_Yrt[indexer_Yrt(r, t, ix)]
 					= ( fp1 - fm1 ) / ( 2.0 * h );
 			}
@@ -251,34 +259,11 @@ namespace Yrt_NS
 		}
 
 		return;
-	}*/
+	}
+	//*/
 
-	/*
-	void set_xinm(int n, int m)
-	{
-		if (n<m)	//Eq.(53) of Persides' Paper II
-			return;
-		else
-		{
-			/*
-			for (int ix = 0; ix < n_x_pts; ++ix)
-			{
-				complex<double> sum = 0.0;
-				for (int s = 0; s < smax; ++s)
-				{
-			
-				}
-				xinm[indexer_xinm(t, m, ix)] = conj(sum);
-			}
-		
-			//try simple version: Eq.(54) of Persides' Paper II
-			double x_inf = 10.0;	//play around with this?
-		
-		}
-		return;
-	}*/
 
-	void get_Yrt_and_xinm(
+	void get_Yrt(
 			vector<complex<double> > * Yrt_in,
 			vector<complex<double> > * ddx_Yrt_in,
 			vector<double> * x_pts_in,
@@ -354,6 +339,10 @@ namespace Yrt_NS
 				A4D.at( indexer_A4D(n, r, s, t) )
 					= A_nrs * pow(-1.0,t) * gsl_sf_choose(s, t);
 		}
+
+		set_Yrt();
+		
+		set_ddx_Yrt();
 
 		return;
 	}

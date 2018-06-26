@@ -14,7 +14,7 @@ namespace Yrt_NS
 {
 	const complex<double> i(0.0,1.0);
 
-	extern int nmax, rmax, smax, l;
+	extern int nmax, rmax, smax, l, n_x_pts;
 
 	void initialize_A3D_starting_values();
 	void set_B1D(int n);
@@ -22,7 +22,7 @@ namespace Yrt_NS
 	void set_A3D(int n, int r, int s);
 	void set_B3D(int n, int t, int s);
 	void set_C3D(int n, int t, int s);
-	void get_Yrt_and_xinm(
+	void get_Yrt(
 			vector<complex<double> > * Yrt_in,
 			vector<complex<double> > * ddx_Yrt_in,
 			vector<double> * x_pts_in,
@@ -102,6 +102,12 @@ namespace Yrt_NS
 	{
 		//range of t is 0<=t<=s ==> just use smax
 		return ( ( ( n * rmax + r ) * smax + s ) * smax + t );
+	}
+
+	inline int indexer_Yrt(int r, int t, int ix)
+	{
+		//range of t is 0<=t<=s ==> just use smax
+		return ( ( r * smax + t ) * n_x_pts + ix );
 	}
 
 }

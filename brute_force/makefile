@@ -1,35 +1,31 @@
 SHELL=/bin/sh
 
 SRCS= \
-main.cpp \
-Zn.cpp \
-Yrt.cpp \
-gauss_quadrature.cpp
+RWeqnSolver.cpp
 
-HDRS= \
-gauss_quadrature.h \
-Zn.h \
-Yrt.h \
-main.h \
-chebyshev_library.h 
+HDRS=
 
 MAKEFILE=makefile
 
-COMMAND=run_Zn_and_Yrt
+COMMAND=run
 
 OBJS= $(addsuffix .o, $(basename $(SRCS)))
 
 CC= g++
-CFLAGS= -pg -g -O3
+CFLAGS= -O3 -lgsl -lgslcblas
+
 WARNFLAGS=
-LDFLAGS= -lgsl -lgslcblas 
-LIBS= -L/sw/lib -I/sw/include
- 
+LDFLAGS= -lgsl -lgslcblas -O3
+LIBS=
+
 $(COMMAND): $(OBJS) $(HDRS) $(MAKEFILE) 
 	$(CC) -o $(COMMAND) $(OBJS) $(LDFLAGS) $(CFLAGS) $(LIBS)
 
+RWeqnSolver.o : RWeqnSolver.cpp
+	$(CC) $(CFLAGS) $(WARNFLAGS) $(LIBS) -c RWeqnSolver.cpp -o RWeqnSolver.o
+
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJS) $(COMMAND)
  
 tarz:
 	tar zcf - $(MAKEFILE) $(SRCS) $(HDRS) > $(COMMAND).tar.gz

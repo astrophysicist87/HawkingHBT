@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#include "RecurrenceRelation.h"
+#include "../RecurrenceRelationSolvers/RecurrenceRelation.h"
 
 void linspace(vector<double> & x, double a, double b);
 
@@ -37,9 +37,12 @@ int main (int argc, char* argv[])
 	const long int kmax = 5000;
 
 	//set initial parameters
-	const complex<double> xi0 = 1.0;			//arbitrary, apparently
-	complex<double> l = 0.0;						//ang. mom. of emitted wave
-	complex<double> s = 0.0;								//spin of scalar field s==0
+	const complex<double> xi0
+		= 1.0/complex<double>(1.37793489515,-0.276560934547);
+	//const complex<double> xi0 = 1.0;
+												//arbitrary, apparently
+	complex<double> l = 0.0;					//ang. mom. of emitted wave
+	complex<double> s = 0.0;					//spin of scalar field s==0
 	//the frequency of the emitted wave
 	//complex<double> omega = 10.0;
 	complex<double> omega = complex<double>(atof(argv[1]));
@@ -53,9 +56,9 @@ int main (int argc, char* argv[])
 	complex<double> mu2 = -(s+1.0);
 
 	//set r grid at which to compute function
-	const int n_r_pts = 2;
+	const int n_r_pts = 10000;
 	vector<double> r_pts(n_r_pts);
-	linspace(r_pts, 200.0, 5000.0);
+	linspace(r_pts, 1.0+1.e-8, 20.0);
 
 	//set coefficients in recurrence relation
 	complex<double> Omega1 = 1.0 - 2.0*i*omega + 2.0*mu1;
@@ -109,6 +112,7 @@ int main (int argc, char* argv[])
 				break;	//converged; terminate loop
 			}
 			r_coefficient *= (r-1.0)/r;
+			/*
 			if (k<=5 and ir == n_r_pts - 1)
 				cout << "TEST: " << k << "   " << setprecision(8)
 						<< "alpha_" << k << " xi_" << k+1 << " + beta_"
@@ -119,6 +123,7 @@ int main (int argc, char* argv[])
 							+ results[k-1]*gamma(k, &params)
 						<< endl << "\t -->rn[" << k << "] = " << rn[k] << "   " << results[k+1]/results[k]
 						 << "   " << -beta(0, &params)/alpha(0, &params) << endl;
+			*/
 		}
 
 		sum *= prefactor;
@@ -126,7 +131,7 @@ int main (int argc, char* argv[])
 			cerr << "Did not converge at r = " << r
 					<< "!!  effective epsilon = " << 2.0*abs(xik * r_coefficient) / abs(sum)
 					<< "; " << abs(xik * r_coefficient) << "   " << abs(sum) << endl;
-		if (ir == n_r_pts - 1)
+		//if (ir == n_r_pts - 1)
 			cout << setw(16) << setprecision(12)
 					<< omega.real() << "   " << r << "   "
 					<< sum.real() << "   " << sum.imag()
@@ -191,7 +196,6 @@ inline complex<double> gamma(int k, void * p)
 	complex<double> Delta2 = (params->Delta2);
 	double dk = k;
 	complex<double> k_0_result = 0.0;
-	//complex<double> k_pos_result = 1.0 - (Omega3 - 3.0)/dk + (Delta2 - Omega3 + 2.0) / (dk*dk);
 	complex<double> k_pos_result = 1.0 + (Omega3 - 3.0)/dk + (Delta2 - Omega3 + 2.0) / (dk*dk);
 
 	if (k==0)
