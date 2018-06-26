@@ -4,6 +4,7 @@ SRCS= \
 RWeqnSolver.cpp \
 Rin.cpp \
 Rout.cpp \
+Rc.cpp \
 system.cpp
 
 
@@ -11,6 +12,7 @@ HDRS= \
 RWeqnSolver.h \
 Rin.h \
 Rout.h \
+Rc.h \
 system.h
 
 MAKEFILE=makefile
