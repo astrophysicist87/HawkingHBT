@@ -49,7 +49,7 @@ void compute_Rout()
 		if (status != GSL_SUCCESS)
 			break;
 
-		printf ("%.5e %.5e %.5e %.5e %.5e\n", t, y[0], y[1], y[2], y[3]);
+		printf ("ROUT: %.5e %.5e %.5e %.5e %.5e\n", t, y[0], y[1], y[2], y[3]);
 	}
 
 	gsl_odeiv_evolve_free (e);

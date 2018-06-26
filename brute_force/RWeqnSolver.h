@@ -13,7 +13,7 @@ const double omega = 0.4;
 const double M = 0.5;
 
 const double r0 = 1.001;
-const double rInf = 100.0;
+const double rInf = 20.0;
 
 inline double Veff(double l, double M, double r)
 {
