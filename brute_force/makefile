@@ -37,7 +37,13 @@ Rin.o : Rin.cpp Rin.h
 Rout.o : Rout.cpp Rout.h
 	$(CC) $(CFLAGS) $(WARNFLAGS) $(LIBS) -c Rout.cpp -o Rout.o
 
-RWeqnSolver.o : RWeqnSolver.cpp RWeqnSolver.h Rin.h
+Rc.o : Rc.cpp Rc.h
+	$(CC) $(CFLAGS) $(WARNFLAGS) $(LIBS) -c Rc.cpp -o Rc.o
+
+system.o : system.cpp system.h
+	$(CC) $(CFLAGS) $(WARNFLAGS) $(LIBS) -c system.cpp -o system.o
+
+RWeqnSolver.o : RWeqnSolver.cpp RWeqnSolver.h Rin.h Rout.h Rc.h system.h
 	$(CC) $(CFLAGS) $(WARNFLAGS) $(LIBS) -c RWeqnSolver.cpp -o RWeqnSolver.o
 
 clean:
