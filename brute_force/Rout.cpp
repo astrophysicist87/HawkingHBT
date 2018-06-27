@@ -14,11 +14,13 @@ void compute_Rout()
 {
 	const gsl_odeiv_step_type * T 
 	 = gsl_odeiv_step_rk8pd;
+	//const gsl_odeiv_step_type * T 
+	// = gsl_odeiv_step_rk4imp;
 
 	gsl_odeiv_step * s 
 	 = gsl_odeiv_step_alloc (T, dim);
 	gsl_odeiv_control * c 
-	 = gsl_odeiv_control_y_new (1e-10, 0.0);
+	 = gsl_odeiv_control_y_new (relative_precision, 0.0);
 	gsl_odeiv_evolve * e 
 	 = gsl_odeiv_evolve_alloc (dim);
 
@@ -39,7 +41,7 @@ void compute_Rout()
 						Rout_prime_at_rInf.real(),
 						Rout_prime_at_rInf.imag() };
 
-	while (t >= t1)
+	while (t > t1)
 	{
 		int status = gsl_odeiv_evolve_apply (e, c, s,
 					                        &sys, 
@@ -49,7 +51,8 @@ void compute_Rout()
 		if (status != GSL_SUCCESS)
 			break;
 
-		printf ("ROUT: %.5e %.5e %.5e %.5e %.5e\n", t, y[0], y[1], y[2], y[3]);
+		//printf ("ROUT: %.5e %.5e %.5e %.5e %.5e\n", t, y[0], y[1], y[2], y[3]);
+		//printf ("ROUT: %.5e %.15e %.15e\n", t, y[0], y[1]);
 	}
 
 	gsl_odeiv_evolve_free (e);
