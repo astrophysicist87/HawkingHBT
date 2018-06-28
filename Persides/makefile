@@ -4,12 +4,14 @@ SRCS= \
 main.cpp \
 Zn.cpp \
 Yrt.cpp \
+Xn.cpp \
 gauss_quadrature.cpp
 
 HDRS= \
 gauss_quadrature.h \
 Zn.h \
 Yrt.h \
+Xn.h \
 main.h \
 chebyshev_library.h 
 

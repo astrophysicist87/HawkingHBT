@@ -30,7 +30,7 @@ void compute_Rin()
 	//double t = 1.0+1.e-8, t1 = 20.0;
 	double t = rInf, t1 = r0;
 	double h = -1e-6;
-	double rsInf = rInf + 2.0*M*log( rInf/(2.0*M) - 1.0 );
+	double rsInf = ( M < 1.e-6 ) ? rInf : rInf + 2.0*M*log( rInf/(2.0*M) - 1.0 );
 	//do purely ingoing mode as test (will not be same as EF solution)
 	complex<double> Rin_at_rInf = exp(-i * omega * rsInf) / rInf;
 	complex<double> Rin_prime_at_rInf

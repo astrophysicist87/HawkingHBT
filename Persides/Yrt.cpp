@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <iostream>
+#include <iomanip>
 #include <complex>
 #include <vector>
+#include <fenv.h>
 
 #include <gsl/gsl_sf_gamma.h>
 #include <gsl/gsl_math.h>
@@ -22,7 +24,7 @@ namespace Yrt_NS
 
 	vector<complex<double> > B1D, C1D;
 	vector<complex<double> > A3D, B3D, C3D;
-	vector<complex<double> > A4D;
+	//vector<complex<double> > A4D;
 
 	vector<complex<double> > Yrt, ddx_Yrt;
 
@@ -66,14 +68,17 @@ namespace Yrt_NS
 	{
 		complex<double> sum = 0.0;
 		for (int u = 0; u < rmax; ++u)
-		for (int t = 0; t <= u+l; ++t)	//double check
-		for (int v = 0; v < smax; ++v)
 		{
-			//if (n==3)
-			//	cout << (l-t+u+1.0) << "   " << pp(t-u) << "   "
-			//			<< A3D.at(indexer_A3D(n-1,u,v)) << "   " << D3D(2*l+n-t,v,0) << endl;
+			int vupper = min(min(n-1, u), smax-1);
+			for (int t = 0; t <= u+l; ++t)	//double check
+			//for (int v = 0; v < smax; ++v)
+			for (int v = 0; v <= vupper; ++v)
+			{
+				//cout << (l-t+u+1.0) << "   " << pp(t-u) << "   "
+				//		<< A3D.at(indexer_A3D(n-1,u,v)) << "   " << D3D(2*l+n-t,v,0) << endl;
 
-			sum += (l-t+u+1.0)*pp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(2*l+n-t,v,0);
+				sum += (l-t+u+1.0)*pp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(2*l+n-t,v,0);
+			}
 		}
 
 		B1D.at(n) = sum;
@@ -84,6 +89,7 @@ namespace Yrt_NS
 
 	void compute_levin_sum(vector<double> computed_terms, double * sum_accel, double * err)
 	{
+		//cout << "In compute_levin_sum(...): N = "<< computed_terms.size() << endl;
 		const int N = computed_terms.size();
 		double t[N];
 		double sum = 0;
@@ -108,6 +114,8 @@ namespace Yrt_NS
 
 		gsl_sum_levin_u_free (w);
 
+		//cout << "Exiting compute_levin_sum(...)." << endl;
+
 		return;
 	}
 
@@ -122,7 +130,9 @@ namespace Yrt_NS
 			for (int u = 0; u <= t; ++u)
 			{
 				//complex<double> sum_ut = 0.0;
-				for (int v = 0; v < smax; ++v)
+				int vupper = min(min(n-1, u), smax-1);
+				//for (int v = 0; v < smax; ++v)
+				for (int v = 0; v <= vupper; ++v)
 				{
 	//				if (t==2)
 	//					cout << (-l-t+u) << "   " << qp(t-u) << "   "
@@ -133,7 +143,7 @@ namespace Yrt_NS
 				}
 
 			}
-			if (USE_SERIES_ACCELERATION and t > n)
+			if ( USE_SERIES_ACCELERATION and t > n )
 			{
 				running_t_terms.push_back( (pow(i,n+1.0)*sum_t).real() );
 			}
@@ -142,7 +152,7 @@ namespace Yrt_NS
 		}
 
 		double sum_accel_im = 0.0, err = 0.0;
-		if (USE_SERIES_ACCELERATION)
+		if ( USE_SERIES_ACCELERATION and running_t_terms.size() > 0 )
 			compute_levin_sum(running_t_terms, &sum_accel_im, &err);
 
 		C1D.at(n) = preliminary_sum + pow(i,-n-1.0)*sum_accel_im;
@@ -168,8 +178,12 @@ namespace Yrt_NS
 	{
 		complex<double> sum = 0.0;
 		for (int u = 0; u < rmax; ++u)
-		for (int v = 0; v < smax; ++v)
-			sum += (l-t+u+1.0)*pp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(2*l+n-t,v,s);
+		{
+			int vupper = min(min(n-1, u), smax-1);
+			//for (int v = 0; v < smax; ++v)
+			for (int v = 0; v <= vupper; ++v)
+				sum += (l-t+u+1.0)*pp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(2*l+n-t,v,s);
+		}
 
 		B3D.at(indexer_B3D(n, t, s)) = sum - B1D.at(n)*double(s==0)*double(2*l+n+1==t);
 		//cout << "B3D[" << n << "," << t << "," << s << "] = " << B3D.at(indexer_B3D(n, t, s)) << endl;
@@ -181,8 +195,12 @@ namespace Yrt_NS
 	{
 		complex<double> sum = 0.0;
 		for (int u = 0; u < rmax; ++u)
-		for (int v = 0; v < smax; ++v)
-			sum += (-l-t+u)*qp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(n-1-t,v,s);
+		{
+			int vupper = min(min(n-1, u), smax-1);
+			//for (int v = 0; v < smax; ++v)
+			for (int v = 0; v <= vupper; ++v)
+				sum += (-l-t+u)*qp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(n-1-t,v,s);
+		}
 
 		C3D.at(indexer_C3D(n, t, s)) = sum - C1D.at(n)*double(s==0)*double(n==t);
 		//cout << "C3D[" << n << "," << t << "," << s << "] = " << C3D.at(indexer_C3D(n, t, s)) << endl;
@@ -220,7 +238,13 @@ namespace Yrt_NS
 			}
 			Yrt[indexer_Yrt(r, t, ix)]
 					= prefactor * sum;
+/*if (r==0 and t==0)
+	cout << r << "   " << t << "   " << x_loc << "   "
+			<< Yrt[indexer_Yrt(r, t, ix)].real() << "   "
+			<< Yrt[indexer_Yrt(r, t, ix)].imag() << endl;*/
 		}
+
+//if (1) exit (8);
 
 		return;
 	}
@@ -289,15 +313,13 @@ namespace Yrt_NS
 		B3D = vector<complex<double> >(rmax*nmax*smax, 0.0);
 		C3D = vector<complex<double> >(rmax*nmax*smax, 0.0);
 
-		A4D = vector<complex<double> >(rmax*nmax*smax*smax, 0.0);
-
 		//cout << "Start." << endl;
 		initialize_A3D_starting_values();
-	
+
 		//cout << "Next." << endl;
 		for (int n = 2; n < nmax; ++n)
 		{
-			//cout << "n = " << n << endl;
+			cerr << "n = " << n << endl;
 			set_B1D(n);
 			set_C1D(n);
 
@@ -314,23 +336,75 @@ namespace Yrt_NS
 		}
 		//cout << "Here." << endl;
 
+/*
+		//checks the X_n(y) functions
 		for (int n = 0; n < nmax; ++n)
-		for (int y = 0; y < 91; ++y)
+		for (int y = 0; y < 101; ++y)
 		{
 			complex<double> sum = 0.0;
-			double y0 = 1.0 + 0.1*y;
+			double y0 = 1.0 + 0.01*y;
 			for (int r = 0; r < rmax; ++r)
 			for (int s = 0; s < smax; ++s)
 				sum += A3D.at(indexer_A3D(n, r, s))
 						* pow(y0, l+n-r) * pow(log(y0), s);
+			if ( n > 0 and abs(y0-1.0) < 1.e-30 ) 
+				sum = 0.0;
+			
 			cout << n << "   " << y0 << "   "
-					<< ( ( n > 0 and abs(y0-1.0) < 1.e-30 ) ? 0.0 : sum )
-					<< endl;
+				<< setprecision(15)
+				<< sum.real() << "   " << sum.imag()
+				<< endl;
 		}
 		cout << endl;
 
+if (1) exit (8);
+*/
+///*
+		//checks the X_n(y) functions
+		for (int y = 0; y < 91; ++y)
+		{
+			complex<double> sum = 0.0;
+			double y0 = 1.0 + 0.1*y;
+			double xs = 1.0;		//for simplicity, for checking purposes
+			double x = y0 * xs;
+			vector<double> inner_sums_re, inner_sums_im;
+			for (int n = 0; n < nmax; ++n)
+			{
+				complex<double> inner_sum = 0.0;
+				for (int r = 0; r < rmax; ++r)
+				for (int s = 0; s < smax; ++s)
+					sum += double(r==0)*A3D.at(indexer_A3D(n, r, s))
+							* pow(y0, l+n-r)
+							* pow(log(y0), s)
+							* pow(x, n);
+				sum += inner_sum;
+				if (n%2==0)
+					inner_sums_re.push_back(inner_sum.real());
+				else
+					inner_sums_im.push_back(inner_sum.imag());
+			}
 
-		for (int n = 0; n < nmax; ++n)
+			//this accelerate real and imaginary parts of sum separately
+			double sum_accel_re = 0.0, sum_accel_im = 0.0, err = 0.0;
+			if (USE_SERIES_ACCELERATION and false)
+			{
+				compute_levin_sum(inner_sums_re, &sum_accel_re, &err);
+				compute_levin_sum(inner_sums_im, &sum_accel_im, &err);
+
+				sum = complex<double> (sum_accel_re, sum_accel_im);
+			}
+			
+			cout << y0 << "   "
+				<< setprecision(15)
+				<< sum.real() << "   " << sum.imag()
+				<< endl;
+		}
+		cout << endl;
+
+if (1) exit (8);
+//*/
+
+		/*for (int n = 0; n < nmax; ++n)
 		for (int r = 0; r < rmax; ++r)
 		for (int s = 0; s < smax; ++s)
 		{
@@ -338,11 +412,18 @@ namespace Yrt_NS
 			for (int t = 0; t <= s; ++t)	//smax is correct
 				A4D.at( indexer_A4D(n, r, s, t) )
 					= A_nrs * pow(-1.0,t) * gsl_sf_choose(s, t);
-		}
+		}*/
 
 		set_Yrt();
 		
 		set_ddx_Yrt();
+
+		//finally, be sure to copy over results!
+		for (int iYrt = 0; iYrt < Yrt.size(); ++iYrt)
+			Yrt_in->at(iYrt) = Yrt.at(iYrt);
+
+		for (int iYrt = 0; iYrt < ddx_Yrt.size(); ++iYrt)
+			ddx_Yrt_in->at(iYrt) = ddx_Yrt.at(iYrt);
 
 		return;
 	}

@@ -47,6 +47,16 @@ namespace Yrt_NS
 	{
 		if (r < 0)
 			return (0.0);
+		else if (r > 95)
+		{
+			double prefactor = pow(-1.0, l+1) / 2.0;
+			double ln_r_fact = gsl_sf_lnfact(r);
+			double ln_twolprp1_fact = gsl_sf_lnfact(2*l+r+1);
+			double ln_lpr_fact = gsl_sf_lnfact(l+r);
+			double ln_result_no_pref = 2.0*ln_lpr_fact - ln_r_fact - ln_twolprp1_fact;
+
+			return ( prefactor * exp( ln_result_no_pref ) );
+		}
 		else
 		{
 			double r_fact = gsl_sf_fact(r);
@@ -71,7 +81,13 @@ namespace Yrt_NS
 
 	inline double D3D(int r, int s, int t)	//N.B. - not the same as r, s, t elsewhere!
 	{
-		if ( r != -1 and 0 <= t and t < s+1 )
+		if (s > 165 or t > 165)
+		{
+			double prefactor = pow(-1.0, s-t) / pow(r+1.0, s-t+1.0);
+			double ln_ratio = gsl_sf_lnfact(s) - gsl_sf_lnfact(t);
+			return (prefactor*exp(ln_ratio));
+		}
+		else if ( r != -1 and 0 <= t and t < s+1 )
 		{
 			double num = pow(-1.0, s-t)*gsl_sf_fact(s);
 			double den = pow(r+1.0, s-t+1.0)*gsl_sf_fact(t);
@@ -98,11 +114,11 @@ namespace Yrt_NS
 		return ( ( n * rmax + t ) * smax + s );
 	}
 
-	inline int indexer_A4D(int n, int r, int s, int t)
+	/*inline int indexer_A4D(int n, int r, int s, int t)
 	{
 		//range of t is 0<=t<=s ==> just use smax
 		return ( ( ( n * rmax + r ) * smax + s ) * smax + t );
-	}
+	}*/
 
 	inline int indexer_Yrt(int r, int t, int ix)
 	{
