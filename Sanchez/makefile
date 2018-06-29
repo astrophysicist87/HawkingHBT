@@ -1,9 +1,11 @@
 SHELL=/bin/sh
 
 SRCS= \
+main.cpp \
 SanchezAsymptotics.cpp
 
-HDRS=
+HDRS= \
+SanchezAsymptotics.h
 
 MAKEFILE=makefile
 
