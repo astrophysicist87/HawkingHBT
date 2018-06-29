@@ -74,7 +74,7 @@ namespace Yrt_NS
 			//for (int v = 0; v < smax; ++v)
 			for (int v = 0; v <= vupper; ++v)
 			{
-				//cout << (l-t+u+1.0) << "   " << pp(t-u) << "   "
+				//cout << "B1D: " << (l-t+u+1.0) << "   " << pp(t-u) << "   "
 				//		<< A3D.at(indexer_A3D(n-1,u,v)) << "   " << D3D(2*l+n-t,v,0) << endl;
 
 				sum += (l-t+u+1.0)*pp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(2*l+n-t,v,0);
@@ -134,9 +134,8 @@ namespace Yrt_NS
 				//for (int v = 0; v < smax; ++v)
 				for (int v = 0; v <= vupper; ++v)
 				{
-	//				if (t==2)
-	//					cout << (-l-t+u) << "   " << qp(t-u) << "   "
-	//							<< A3D.at(indexer_A3D(n-1,u,v)) << "   " << D3D(n-1-t,v,0) << endl;
+					//cout << "C1D: " << (-l-t+u) << "   " << qp(t-u) << "   "
+					//		<< A3D.at(indexer_A3D(n-1,u,v)) << "   " << D3D(n-1-t,v,0) << endl;
 					//sum += (-l-t+u)*qp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(n-1-t,v,0);
 					sum_t += (-l-t+u)*qp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(n-1-t,v,0);
 					//sum_ut += (-l-t+u)*qp(t-u)*A3D.at(indexer_A3D(n-1,u,v))*D3D(n-1-t,v,0);
@@ -170,7 +169,7 @@ namespace Yrt_NS
 					- pp(r-t)*C3D.at(indexer_C3D(n, t, s));
 
 		A3D.at(indexer_A3D(n,r,s)) = 4.0*i*sum;
-		//cout << "A3D[" << n << "," << r << "," << s << "] = " << A3D.at(indexer_A3D(n,r,s)) << endl;
+		cout << "A3D[" << n << "," << r << "," << s << "] = " << A3D.at(indexer_A3D(n,r,s)) << endl;
 		return;
 	}
 
