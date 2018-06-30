@@ -50,10 +50,14 @@ void horizon_expansion( double x0,
 
 /*
 cout << "n = " << n << endl;
+cout << "coeffnp2 = " << 0.0 << endl;
+cout << "coeffnp1 = " << 0.0 << endl;
 cout << "coeffn = " << coeffn << endl;
 cout << "coeffnm1 = " << coeffnm1 << endl;
 cout << "coeffnm2 = " << coeffnm2 << endl;
 cout << "coeffnm3 = " << coeffnm3 << endl;
+cout << "dnp2 = " << 0.0 << endl;
+cout << "dnp1 = " << 0.0 << endl;
 cout << "dn = " << dn << endl;
 cout << "dnm1 = " << dnm1 << endl;
 cout << "dnm2 = " << dnm2 << endl;
@@ -81,7 +85,7 @@ cout << "dnm3 = " << dnm3 << endl;
 
 	//cout << "FINAL:   " << sum.real() << "   " << sum.imag() << "   "
 	//		<< sum2.real() << "   " << sum2.imag() << endl;
-	complex<double> prefactor = exp(-i*xs -i * xs * log(abs(x0-xs)));
+	complex<double> prefactor = exp(/*-i*xs*/ -i * xs * log(abs(x0-xs)));
 
 	phi_at_x0 = prefactor * sum;
 	phi_prime_at_x0 = prefactor * ( -i*xs*sum/(x0-xs) + sum2 );
@@ -102,19 +106,19 @@ void arbitrary_expansion( double b, double x1,
 		cerr << "y <= 0.0!!!  Something went wrong..." << endl;
 		exit(8);
 	}
-//debugger(__LINE__, __FILE__);
+
 	//set initial conditions at x==b in terms of phi(b) and phi'(b)
 	complex<double> icC0 = exp(i*xs*log(y))*phi_at_x0;
 	complex<double> icC1 = exp((i*xs-1.0)*log(y))
 							* ( i*xs*phi_at_x0 + y * phi_prime_at_x0 );
-//debugger(__LINE__, __FILE__);
+
 	complex<double> Cn = icC0, Cnp1 = icC1, Cnp2 = 0.0;
 	complex<double> Cnm1 = 0.0, Cnm2 = 0.0, Cnm3 = 0.0;
-//debugger(__LINE__, __FILE__);
+
 	complex<double> sum = icC0 + icC1*(x1-b);
 	complex<double> sum2 = icC1;
 	double factor = x1-b;
-//debugger(__LINE__, __FILE__);
+
 	int in = 0;
 	complex<double> prevsum = sum, prevsum2 = sum2;
 	do
@@ -122,49 +126,50 @@ void arbitrary_expansion( double b, double x1,
 		double n = in;
 		prevsum = sum;
 		prevsum2 = sum2;
-//debugger(__LINE__, __FILE__);
+
 		complex<double> coeffnp2 = b*y*y*(n+1.0)*(n+2.0);
 		complex<double> coeffnp1 = y*(n+1.0)*( y*(n+1.0) + b*(2.0*n+1.0-2.0*i*xs) );
 		complex<double> coeffn = (b+2.0*y)*n*n
 									+ (y-2.0*i*xs*(y+b))*n
 									+ b*(b*b-xs*xs)
 									- y*(l+i*xs);
-		complex<double> coeffnm1 = (n-1.0)*(n-2.0*i*xs)+3.0*b*b - l - xs*(i+xs);
+		complex<double> coeffnm1 = (n-1.0)*(n-2.0*i*xs)+3.0*b*b - l/**(l+1.0)*/ - xs*(i+xs);
 		complex<double> coeffnm2 = 3.0*b;
 		complex<double> coeffnm3 = 1.0;
-/*cout << "coeffnp2 = " << coeffnp2 << endl;
+/*
+cout << "n = " << n << endl;
+cout << "coeffnp2 = " << coeffnp2 << endl;
 cout << "coeffnp1 = " << coeffnp1 << endl;
 cout << "coeffn = " << coeffn << endl;
 cout << "coeffnm1 = " << coeffnm1 << endl;
 cout << "coeffnm2 = " << coeffnm2 << endl;
-cout << "coeffnm3 = " << coeffnm3 << endl;*/
-cout << "n = " << n << endl;
+cout << "coeffnm3 = " << coeffnm3 << endl;
 cout << "Cnp2 = " << Cnp2 << endl;
 cout << "Cnp1 = " << Cnp1 << endl;
 cout << "Cn = " << Cn << endl;
 cout << "Cnm1 = " << Cnm1 << endl;
 cout << "Cnm2 = " << Cnm2 << endl;
 cout << "Cnm3 = " << Cnm3 << endl;
-//debugger(__LINE__, __FILE__);
+*/
+
 		Cnp2 = - ( coeffnp1*Cnp1
 					+ coeffn*Cn
 					+ coeffnm1*Cnm1
 					+ coeffnm2*Cnm2
 					+ coeffnm3*Cnm3 )
 				/ coeffnp2;
-//debugger(__LINE__, __FILE__);
+
 		//sum2 defined with different factor!!!
 		sum2 += Cnp2 * (n+2.0) * factor;
 		factor *= x1-b;
 		sum += Cnp2 * factor;
-//debugger(__LINE__, __FILE__);
 
 		Cnm3 = Cnm2;
 		Cnm2 = Cnm1;
 		Cnm1 = Cn;
 		Cn = Cnp1;
 		Cnp1 = Cnp2;
-//debugger(__LINE__, __FILE__);
+
 		//cout << n+2 << "   " << Cnp2 << "   " << Cnp1 / Cn << endl;
 		//cout << n+2 << "   " << sum << endl;
 		in++;
