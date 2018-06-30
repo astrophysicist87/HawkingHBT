@@ -83,15 +83,29 @@ namespace Yrt_NS
 	{
 		if (s > 165 or t > 165)
 		{
-			double prefactor = pow(-1.0, s-t) / pow(r+1.0, s-t+1.0);
-			double ln_ratio = gsl_sf_lnfact(s) - gsl_sf_lnfact(t);
-			return (prefactor*exp(ln_ratio));
+			if (abs(s-t) <= 500)
+			{
+				double prefactor = pow(-1.0, s-t) / pow(r+1.0, s-t+1.0);
+				double ln_ratio = gsl_sf_lnfact(s) - gsl_sf_lnfact(t);
+				return (prefactor*exp(ln_ratio));
+			}
+			else
+				return (0.0);
 		}
-		else if ( r != -1 and 0 <= t and t < s+1 )
+		if ( r != -1 and 0 <= t and t < s+1 )
 		{
-			double num = pow(-1.0, s-t)*gsl_sf_fact(s);
-			double den = pow(r+1.0, s-t+1.0)*gsl_sf_fact(t);
-			return (num/den);
+			if (s > 165 or t > 165)
+			{
+				double prefactor = pow(-1.0, s-t) / pow(r+1.0, s-t+1.0);
+				double ln_ratio = gsl_sf_lnfact(s) - gsl_sf_lnfact(t);
+				return (prefactor*exp(ln_ratio));
+			}
+			else
+			{
+				double num = pow(-1.0, s-t)*gsl_sf_fact(s);
+				double den = pow(r+1.0, s-t+1.0)*gsl_sf_fact(t);
+				return (num/den);
+			}
 		}
 		else if ( r == -1 and t == s+1 )
 			return ( 1.0 / (s + 1.0) );

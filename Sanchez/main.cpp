@@ -1,5 +1,7 @@
+#include <cstdlib>
 #include <iostream>
 #include <complex>
+#include <fenv.h>
 
 #include "SanchezAsymptotics.h"
 
@@ -7,14 +9,45 @@ using namespace std;
 
 int main(void)
 {
-	complex<double> phi_at_x = 0.0, phi_prime_at_x = 0.0;
-	if (mode == 0)
-		arbitrary_expansion();
-	else
-		horizon_expansion(phi_at_x, phi_prime_at_x);
+	feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
 
-	cout << phi_at_x.real() << "   " << phi_at_x.imag() << "   "
-			<< phi_prime_at_x.real() << "   " << phi_prime_at_x.imag() << endl;
+	complex<double> phi_at_x0 = 0.0, phi_prime_at_x0 = 0.0;
+
+	double x0 = xs + stepsize;	//take initial step and get expansion here
+	for (int tmp = 0; tmp < 100000-1; ++tmp)
+	//for (int tmp = 0; tmp < 10-1; ++tmp)
+	{
+		horizon_expansion(x0, phi_at_x0, phi_prime_at_x0);
+
+		cout << x0 << "   "
+				<< phi_at_x0.real() << "   "
+				<< phi_at_x0.imag() << "   "
+				<< phi_prime_at_x0.real() << "   "
+				<< phi_prime_at_x0.imag() << endl;
+
+		x0 += stepsize;
+	}
+if (1) return (0);
+	int nsteps = 9;
+	double xold = x0, xnew = x0 + stepsize;
+	for (int step = 0; step < nsteps; ++step)
+	{
+		complex<double> phi_at_x = phi_at_x0;
+		complex<double> phi_prime_at_x = phi_prime_at_x0;
+
+		arbitrary_expansion(xold, xnew,
+							phi_at_x0, phi_prime_at_x0,
+							phi_at_x, phi_prime_at_x);
+
+		cout << xnew << "   "
+				<< phi_at_x.real() << "   "
+				<< phi_at_x.imag() << "   "
+				<< phi_prime_at_x.real() << "   "
+				<< phi_prime_at_x.imag() << endl;
+
+		xold += stepsize;
+		xnew += stepsize;
+	}
 
 	return (0);
 }
