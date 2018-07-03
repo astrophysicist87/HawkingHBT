@@ -9,12 +9,14 @@ using namespace std;
 
 const complex<double> i(0.0, 1.0);
 
-//const double stepsize = 0.00001;
-const double stepsize = 0.1;
-const double tolerance = 1.e-10;
-
-const double xs = 1.0;
+const double rs = 1.0;
+const double omega = 0.4;
+const double xs = rs*omega;
 const double l = 0;
+
+//const double stepsize = 0.00001;
+const double stepsize = 0.005*xs;
+const double tolerance = 1.e-20;
 
 void arbitrary_expansion( double b, double x1,
 							complex<double> phi_at_x0,

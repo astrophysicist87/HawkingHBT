@@ -10,7 +10,7 @@ const complex<double> i(0.0, 1.0);
 const int dim = 4;
 const double l = 0.0;
 const double omega = 0.4;
-const double M = 0.0;
+const double M = 0.5;
 
 const double r0 = 1.0+1.e-5;
 const double rInf = 20.0;

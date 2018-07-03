@@ -13,8 +13,6 @@ void horizon_expansion( double x0,
 						complex<double> & phi_at_x0,
 						complex<double> & phi_prime_at_x0 )
 {
-	//double x0 = xs + stepsize;	//take initial step and get expansion here
-
 	//set initial conditions at horizon
 	complex<double> icd0 = 1.0;
 	complex<double> icd1 = 0.0;
@@ -35,19 +33,14 @@ void horizon_expansion( double x0,
 		double n = in;
 		prevsum = sum;
 		prevsum2 = sum2;
-
+//debugger(__LINE__, __FILE__);
 		complex<double> coeffn = (n-2.0*i*xs)*n*xs;
 		complex<double> coeffnm1 = (n+l)*(n-l-1.0)
 									+ 2.0*xs*xs
 									- (2.0*n-1.0)*i*xs;
 		complex<double> coeffnm2 = 3.0*xs;
 		complex<double> coeffnm3 = 1.0;
-
-		dn = - ( coeffnm1*dnm1
-					+ coeffnm2*dnm2
-					+ coeffnm3*dnm3 )
-				/ coeffn;
-
+//debugger(__LINE__, __FILE__);
 /*
 cout << "n = " << n << endl;
 cout << "coeffnp2 = " << 0.0 << endl;
@@ -63,16 +56,21 @@ cout << "dnm1 = " << dnm1 << endl;
 cout << "dnm2 = " << dnm2 << endl;
 cout << "dnm3 = " << dnm3 << endl;
 */
+		dn = - ( coeffnm1*dnm1
+					+ coeffnm2*dnm2
+					+ coeffnm3*dnm3 )
+				/ coeffn;
+//debugger(__LINE__, __FILE__);
 
 		//sum2 defined with different factor!!!
 		sum2 += dn * n * factor;	//term: d_n * n * (x-xs)^(n-1)
 		factor *= x0-xs;
 		sum += dn * factor;			//term: d_n * (x-xs)^n
-
+//debugger(__LINE__, __FILE__);
 		dnm3 = dnm2;
 		dnm2 = dnm1;
 		dnm1 = dn;
-
+//debugger(__LINE__, __FILE__);
 		//cout << n << "   " << sum.real() << "   " << sum.imag() << "   "
 		//		<< sum2.real() << "   " << sum2.imag() << endl;
 		in++;
@@ -85,7 +83,7 @@ cout << "dnm3 = " << dnm3 << endl;
 
 	//cout << "FINAL:   " << sum.real() << "   " << sum.imag() << "   "
 	//		<< sum2.real() << "   " << sum2.imag() << endl;
-	complex<double> prefactor = exp(/*-i*xs*/ -i * xs * log(abs(x0-xs)));
+	complex<double> prefactor = exp( - i * xs - i * xs * log( abs(x0-xs) ) );
 
 	phi_at_x0 = prefactor * sum;
 	phi_prime_at_x0 = prefactor * ( -i*xs*sum/(x0-xs) + sum2 );
@@ -94,12 +92,13 @@ cout << "dnm3 = " << dnm3 << endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-void arbitrary_expansion( double b, double x1,
+void arbitrary_expansion( double x0, double x1,
 							complex<double> phi_at_x0,
 							complex<double> phi_prime_at_x0,
 							complex<double> & phi_at_x1,
 							complex<double> & phi_prime_at_x1 )
 {
+	double b = x0;
 	double y = b - xs;
 	if (y <= 0.0)
 	{
@@ -108,9 +107,11 @@ void arbitrary_expansion( double b, double x1,
 	}
 
 	//set initial conditions at x==b in terms of phi(b) and phi'(b)
-	complex<double> icC0 = exp(i*xs*log(y))*phi_at_x0;
-	complex<double> icC1 = exp((i*xs-1.0)*log(y))
+	complex<double> icC0 = exp(i*xs+i*xs*log(y))*phi_at_x0;
+	complex<double> icC1 = exp(i*xs+(i*xs-1.0)*log(y))
 							* ( i*xs*phi_at_x0 + y * phi_prime_at_x0 );
+	//cout << "START:   " << icC0.real() << "   " << icC0.imag() << "   "
+	//		<< icC1.real() << "   " << icC1.imag() << endl;
 
 	complex<double> Cn = icC0, Cnp1 = icC1, Cnp2 = 0.0;
 	complex<double> Cnm1 = 0.0, Cnm2 = 0.0, Cnm3 = 0.0;
@@ -136,6 +137,14 @@ void arbitrary_expansion( double b, double x1,
 		complex<double> coeffnm1 = (n-1.0)*(n-2.0*i*xs)+3.0*b*b - l/**(l+1.0)*/ - xs*(i+xs);
 		complex<double> coeffnm2 = 3.0*b;
 		complex<double> coeffnm3 = 1.0;
+
+		Cnp2 = - ( coeffnp1*Cnp1
+					+ coeffn*Cn
+					+ coeffnm1*Cnm1
+					+ coeffnm2*Cnm2
+					+ coeffnm3*Cnm3 )
+				/ coeffnp2;
+
 /*
 cout << "n = " << n << endl;
 cout << "coeffnp2 = " << coeffnp2 << endl;
@@ -151,13 +160,6 @@ cout << "Cnm1 = " << Cnm1 << endl;
 cout << "Cnm2 = " << Cnm2 << endl;
 cout << "Cnm3 = " << Cnm3 << endl;
 */
-
-		Cnp2 = - ( coeffnp1*Cnp1
-					+ coeffn*Cn
-					+ coeffnm1*Cnm1
-					+ coeffnm2*Cnm2
-					+ coeffnm3*Cnm3 )
-				/ coeffnp2;
 
 		//sum2 defined with different factor!!!
 		sum2 += Cnp2 * (n+2.0) * factor;
@@ -180,7 +182,7 @@ cout << "Cnm3 = " << Cnm3 << endl;
 				or disc(prevsum2.imag(), sum2.imag()) > tolerance
 			);
 
-	complex<double> prefactor = exp(-i * xs * log(abs(x1-xs)));
+	complex<double> prefactor = exp( - i * xs - i * xs * log( abs(x1-xs) ) );
 
 	phi_at_x1 = prefactor * sum;
 	phi_prime_at_x1 = prefactor * ( -i*xs*sum/(x1-xs) + sum2 );
